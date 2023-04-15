@@ -3,6 +3,8 @@ let SpawnCounter = 0;
 let bot = 0;
 let botmovecount = 0;
 let delay = 4;
+let circles = [];
+let circOn = 0;
 
 
 function setup() 
@@ -15,21 +17,26 @@ function setup()
    }
    for(let i = 0; i < 500; i ++)
    {
-      let x = Math.floor(Math.random() * 1400) - 100;
-      let y = Math.floor(Math.random() * 700) - 50;
-      let s = Math.floor(Math.random() * 250) + 50;
+      let x = 600//Math.floor(Math.random() * 1200);
+      let y = 250//Math.floor(Math.random() * 600);
+      let s = Math.floor(Math.random() * 150) + 50;
       let c1 = Math.floor(Math.random() * 255);
-      let c2 = Math.floor(Math.random() * 255);
-      if((c1 + c2) < 0)
+      let d = Math.random() * 2 * Math.PI; // 3.14159265358979323846264338327950288419716939937510;
+      let ss = (Math.floor(Math.random() * 4) + 2);
+      while(c1 < 175 && c1 > 75)
       {
-         c1 = 255 - c1;
-      }
-      if((c1 + c2) > 4500)
-      {
-         c1 -= 180;
+         c1 = Math.floor(Math.random() * 255);
       }
       fill(c1,255-c1,255-c1);
       ellipse(x,y,s,s);
+      let circle = [];
+      circle[0] = x
+      circle[1] = y
+      circle[2] = s
+      circle[3] = c1
+      circle[4] = d
+      circle[5] = ss
+      circles[i] = circle
 
    }
 
@@ -44,6 +51,12 @@ function draw()
    {
       movebot1(maintiles);
    }
+   if(circOn == 0)
+   {
+      background(150,150,150);
+      drawcircles(circles);
+   } 
+   
    drawtiles(maintiles); 
 }
 
@@ -107,6 +120,17 @@ function keyTyped()
       else
       {
          bot = 0;
+      }
+   }
+   if(key == 'c')
+   {
+      if(circOn != 0)
+      {
+         circOn = 0
+      }
+      else
+      {
+         circOn = 1
       }
    }
 }
@@ -590,12 +614,72 @@ function rowcheck(tiles, start, rowinc)
    return yes;
 }
 
+function drawcircles(circles)
+{
+   for(let i = 0; i < 500; i ++)
+   {
+      let x = circles[i][0]
+      let y = circles[i][1]
+      let s = circles[i][2]
+      let c1 = circles[i][3]
+      let d = circles[i][4]
+      let ss = circles[i][5]
+
+      let nx = Math.cos(d) * ss
+      let ny = Math.sin(d) * ss
+
+      if((y + ny) - (s/2) < 0)
+      {  
+         circles[i][4] = (2*Math.PI - d);
+         d = circles[i][4] 
+         ny = Math.sin(d)
+      }
+      if(y+ny+(s/2) > 500)
+      {
+         circles[i][4] = (2*Math.PI - d);
+         d = circles[i][4] 
+         ny = Math.sin(d)
+      }
+
+      if((x+nx) - (s/2) < 0)
+      {
+         nd = (Math.PI - d);
+         if (nd < 0)
+         {
+            nd += 2*Math.PI;
+         }
+         circles[i][4] = nd
+         d = circles[i][4] 
+         nx = Math.cos(d)
+      }
+      if(x+nx +(s/2) > 1200)
+      {
+         nd = (Math.PI - d);
+         if (nd < 0)
+         {
+            nd += 2*Math.PI;
+         }
+         circles[i][4] = nd
+         d = circles[i][4] 
+         nx = Math.cos(d)
+      }
+
+      circles[i][0] += nx
+      circles[i][1] += ny
+      x = circles[i][0]
+      y = circles[i][1]
+      
+      fill(c1,255-c1,255-c1);
+      ellipse(x,y,s,s);
+   }
+}
+
 function drawtiles(tiles)
 {
    for(let i=0; i<16; i++)
    {
-      let x = 400 + 80 * (i%4)
-      let y = 80 + 80 * ((i - i%4) / 4)
+      let x = 440 + 80 * (i%4)
+      let y = 90 + 80 * ((i - i%4) / 4)
 
       ii = tiles[i];
       
@@ -679,6 +763,8 @@ function drawtiles(tiles)
    }
 
 }
+
+
 
 // function move(tiles, direc) // down direc = 2; right = 3 left 4
 // {
